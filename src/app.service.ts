@@ -6,6 +6,13 @@ dotenv.config();
 
 @Injectable()
 export class AppService {
+  private readonly GOOGLE_CLOUD_VISION_API_KEY =
+    process.env.GOOGLE_CLOUD_VISION_API_KEY;
+  private readonly GOOGLE_CLOUD_PROJECT_ID =
+    process.env.GOOGLE_CLOUD_PROJECT_ID;
+  private readonly GOOGLE_CLOUD_LOCATION_ID =
+    process.env.GOOGLE_CLOUD_LOCATION_ID;
+
   async getSimilarProducts({ encodedImage }) {
     const url = `https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_CLOUD_VISION_API_KEY}`;
     return axios
@@ -23,8 +30,7 @@ export class AppService {
             ],
             imageContext: {
               productSearchParams: {
-                productSet:
-                  'projects/devops-tribe/locations/us-west1/productSets/409fddfc470db26c',
+                productSet: `projects/${this.GOOGLE_CLOUD_PROJECT_ID}/locations/${this.GOOGLE_CLOUD_LOCATION_ID}/productSets/409fddfc470db26c`,
                 productCategories: ['apparel-v2'],
                 filter: '',
               },
@@ -34,23 +40,14 @@ export class AppService {
       })
       .then(async (res: any) => {
         const { results } = res.data.responses[0].productSearchResults;
-        console.log({ results });
         const response = await Promise.all(
           results.map(async (item) => {
-            const [, projectId, , locationId, , productId, , referenceImages] =
+            const [, , , , , productId, , referenceImages] =
               item.image.split('/');
-            console.log({
-              projectId,
-              locationId,
+            const uri = await this.getImageUrlFromReferenceImages({
               productId,
               referenceImages,
             });
-            item.image.split('/');
-            const {
-              data: { uri },
-            }: any = await axios.get(
-              `https://vision.googleapis.com/v1/projects/${projectId}/locations/${locationId}/products/${productId}/referenceImages/${referenceImages}?key=${process.env.GOOGLE_CLOUD_VISION_API_KEY}`,
-            );
             return {
               score: item.score,
               name: item.product.displayName,
@@ -68,5 +65,14 @@ export class AppService {
         console.error(error);
         return error;
       });
+  }
+
+  private async getImageUrlFromReferenceImages({ productId, referenceImages }) {
+    const {
+      data: { uri },
+    } = await axios.get(
+      `https://vision.googleapis.com/v1/projects/${this.GOOGLE_CLOUD_PROJECT_ID}/locations/${this.GOOGLE_CLOUD_LOCATION_ID}/products/${productId}/referenceImages/${referenceImages}?key=${process.env.GOOGLE_CLOUD_VISION_API_KEY}`,
+    );
+    return uri.replace('gs://', 'https://storage.cloud.google.com/');
   }
 }
