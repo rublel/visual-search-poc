@@ -61,7 +61,7 @@ export class AppService {
           }),
         );
         return response
-          .filter((item) => item.score > 0.01)
+          .filter((item) => item.score > 0.4)
           .sort((a, b) => b.score - a.score);
       })
       .catch((error) => {
