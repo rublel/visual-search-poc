@@ -32,14 +32,19 @@ export class AppService {
           },
         ],
       })
-      .then((res: any) => {
+      .then(async (res: any) => {
         const { results } = res.data.responses[0].productSearchResults;
         console.log({ results });
-        return Promise.all(
+        const response = await Promise.all(
           results.map(async (item) => {
             const [, projectId, , locationId, , productId, , referenceImages] =
               item.image.split('/');
-            console.log({ projectId, locationId, productId, referenceImages });
+            console.log({
+              projectId,
+              locationId,
+              productId,
+              referenceImages,
+            });
             item.image.split('/');
             const {
               data: { uri },
@@ -55,6 +60,9 @@ export class AppService {
             };
           }),
         );
+        return response
+          .filter((item) => item.score > 0.01)
+          .sort((a, b) => b.score - a.score);
       })
       .catch((error) => {
         console.error(error);
