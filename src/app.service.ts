@@ -52,7 +52,7 @@ export class AppService {
               score: item.score,
               name: item.product.displayName,
               description: item.product.description,
-              image: uri.replace('gs://', 'https://storage.cloud.google.com/'),
+              image: uri,
               labels: item.product.productLabels,
             };
           }),
@@ -73,6 +73,6 @@ export class AppService {
     } = await axios.get(
       `https://vision.googleapis.com/v1/projects/${this.GOOGLE_CLOUD_PROJECT_ID}/locations/${this.GOOGLE_CLOUD_LOCATION_ID}/products/${productId}/referenceImages/${referenceImages}?key=${process.env.GOOGLE_CLOUD_VISION_API_KEY}`,
     );
-    return uri.replace('gs://', 'https://storage.cloud.google.com/');
+    return uri.replace('gs://', 'https://storage.googleapis.com/');
   }
 }
