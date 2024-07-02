@@ -6,15 +6,12 @@ dotenv.config();
 
 @Injectable()
 export class AppService {
-  private readonly GOOGLE_CLOUD_VISION_API_KEY =
-    process.env.GOOGLE_CLOUD_VISION_API_KEY;
-  private readonly GOOGLE_CLOUD_PROJECT_ID =
-    process.env.GOOGLE_CLOUD_PROJECT_ID;
-  private readonly GOOGLE_CLOUD_LOCATION_ID =
-    process.env.GOOGLE_CLOUD_LOCATION_ID;
+  private GOOGLE_CLOUD_VISION_API_KEY = process.env.GOOGLE_CLOUD_VISION_API_KEY;
+  private GOOGLE_CLOUD_PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT_ID;
+  private GOOGLE_CLOUD_LOCATION_ID = process.env.GOOGLE_CLOUD_LOCATION_ID;
 
   async getSimilarProducts({ encodedImage }) {
-    const url = `https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_CLOUD_VISION_API_KEY}`;
+    const url = `https://vision.googleapis.com/v1/images:annotate?key=${this.GOOGLE_CLOUD_VISION_API_KEY}`;
     return axios
       .post(url, {
         requests: [
@@ -30,7 +27,7 @@ export class AppService {
             ],
             imageContext: {
               productSearchParams: {
-                productSet: `projects/${this.GOOGLE_CLOUD_PROJECT_ID}/locations/${this.GOOGLE_CLOUD_LOCATION_ID}/productSets/409fddfc470db26c`,
+                productSet: `projects/${this.GOOGLE_CLOUD_PROJECT_ID}/locations/${this.GOOGLE_CLOUD_LOCATION_ID}/productSets/5b2eb3e30d78ce32`,
                 productCategories: ['apparel-v2'],
                 filter: '',
               },
@@ -71,7 +68,7 @@ export class AppService {
     const {
       data: { uri },
     } = await axios.get(
-      `https://vision.googleapis.com/v1/projects/${this.GOOGLE_CLOUD_PROJECT_ID}/locations/${this.GOOGLE_CLOUD_LOCATION_ID}/products/${productId}/referenceImages/${referenceImages}?key=${process.env.GOOGLE_CLOUD_VISION_API_KEY}`,
+      `https://vision.googleapis.com/v1/projects/${this.GOOGLE_CLOUD_PROJECT_ID}/locations/${this.GOOGLE_CLOUD_LOCATION_ID}/products/${productId}/referenceImages/${referenceImages}?key=${this.GOOGLE_CLOUD_VISION_API_KEY}`,
     );
     return uri.replace('gs://', 'https://storage.googleapis.com/');
   }
