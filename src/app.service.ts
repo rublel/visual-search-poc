@@ -47,6 +47,7 @@ export class AppService {
             });
             return {
               score: item.score,
+              id: item.product.name.split('/').pop(),
               name: item.product.displayName,
               description: item.product.description,
               image: uri,
@@ -54,9 +55,7 @@ export class AppService {
             };
           }),
         );
-        return response
-          .filter((item) => item.score > 0.4)
-          .sort((a, b) => b.score - a.score);
+        return response.sort((a, b) => b.score - a.score);
       })
       .catch((error) => {
         console.error(error);
